@@ -1,23 +1,13 @@
-SRCS=$(wildcard */*.c)
-OBJS=$(SRCS:.c=.o)
-CC=gcc
-#CFLAGS+=-Wall -Werror -fsanitize=address
-CFLAGS= -Wall -Werror
+CC = cc
+LDFLAGS = -lpthread
+OBJS := $(subst .c,.o,$(wildcard */*.c))
 
-.PHONY:all
-# all :$(OBJS)
-# #'\'是续行符
-# 	$(foreach obj,$(OBJS),\
-# 	$(CC) $(obj) -o $(basename $(obj));)
-all:$(OBJS)
+.PHONY: all
+all: $(OBJS)
 
-%.o :%.c
-	$(CC) $< -o $(basename $@) $(CFLAGS)
+%.o:%.c
+	$(CC) -o $(basename $@) $< $(LDFLAGS)
 
-.PHONY:clean
+.PHONY: clean
 clean:
-# rm -f $(OBJS)
-	rm -f $(basename $(OBJS))
-
-
-	
+	rm $(basename $(OBJS))

@@ -161,7 +161,7 @@ void execute_command(char *command_array[], int n, int client_sock)
     else{
         int my_pipes[2];
         if(pipe(my_pipes)==-1){
-            strcpy(temp, "Error: Failed to execute the commmand.\n");
+            strcpy(temp, "Error: Pipe failed.\n");
             write(client_sock, temp, strlen(temp));
         };
         //执行'|'前的指令

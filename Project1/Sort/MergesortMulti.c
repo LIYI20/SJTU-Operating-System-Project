@@ -1,5 +1,5 @@
-//mutil thread to do the mergesort
-//We need to set the max_thread
+// mutil thread to do the mergesort
+// We need to set the max_thread
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -10,8 +10,9 @@
 void *MergeSort(void *arg);
 void Merge(int *array, int left, int mid, int right);
 
-//define argemnts
-struct arguments{
+// define argemnts
+struct arguments
+{
     int *array;
     int left;
     int right;
@@ -26,14 +27,16 @@ int main(int argc, char *argv[])
         printf("Error: argc's value is not allowed\n");
         exit(-1);
     }
-    max_thread= atoi(argv[1]);
+    max_thread = atoi(argv[1]);
     int n;
     printf("请输入将要排序数组的长度\n");
     scanf("%d", &n);
     printf("请输入数组，以空格分割\n");
     int *array = (int *)malloc(sizeof(int) * n);
     for (int i = 0; i < n; i++)
+    {
         scanf("%d", &array[i]);
+    }
 
     clock_t start, end;
     double elapsed;
@@ -43,31 +46,33 @@ int main(int argc, char *argv[])
     pthread_t t0;
     pthread_create(&t0, NULL, MergeSort, &args);
     pthread_join(t0, NULL);
+    MergeSort(&args);
     // 打印函数
     printf("排序后的数组为：\n");
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++)
+    {
         printf("%d ", array[i]);
     }
 
     end = clock();
     elapsed = ((double)(end - start)) / CLOCKS_PER_SEC * 1000;
     printf("Time used: %f millisecond\n", elapsed);
-    
+
     free(array);
     return 0;
 }
-void* MergeSort(void*arg)
+void *MergeSort(void *arg)
 {
-    struct arguments* my_arg = (struct arguments *)arg;
+    struct arguments *my_arg = (struct arguments *)arg;
     int *array = my_arg->array;
     int left = my_arg->left;
     int right = my_arg->right;
 
     if (left >= right)
-        pthread_exit(0);
+        return NULL;
     int mid = (left + right) >> 1;
     struct arguments my_arguments[2];
-    //构造arguments
+    // 构造arguments
     my_arguments[0].array = array;
     my_arguments[0].left = left;
     my_arguments[0].right = mid;
@@ -75,12 +80,13 @@ void* MergeSort(void*arg)
     my_arguments[1].array = array;
     my_arguments[1].left = mid + 1;
     my_arguments[1].right = right;
-    //创建线程来执行子问题
-    if(used_thread<max_thread){
-        pthread_t t1,t2;
+    // // 创建线程来执行子问题
+    if (used_thread + 2 <= max_thread)
+    {
+        pthread_t t1, t2;
         used_thread += 2;
         int rc1 = pthread_create(&t1, NULL, MergeSort, &my_arguments[0]);
-        if(rc1)
+        if (rc1)
         {
             printf("ERROR; return code from pthread_create(t1) is %d\n", rc1);
             exit(-1);
@@ -99,23 +105,21 @@ void* MergeSort(void*arg)
             printf("Error: return code from pthread_join(t1) is %d\n", rc3);
             exit(1);
         }
-        used_thread--;
+
         int rc4 = pthread_join(t2, NULL);
         if (rc4)
         {
             printf("Error: return code from pthread_join(t2) is %d\n", rc4);
             exit(1);
         }
-        used_thread--;
         Merge(array, left, mid, right);
+        return NULL;
     }
 
-    else {
-        MergeSort(&my_arguments[0]);
-        MergeSort(&my_arguments[1]);
-        Merge(array, left, mid, right);
-    }
-    pthread_exit(0);
+    MergeSort(&my_arguments[0]);
+    MergeSort(&my_arguments[1]);
+    Merge(array, left, mid, right);
+    return NULL;
 }
 
 void Merge(int *array, int left, int mid, int right)
