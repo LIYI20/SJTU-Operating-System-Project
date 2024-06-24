@@ -27,7 +27,7 @@ _Bool format = 0;           // 是否进行格式化
 super_block superb;
 int superblock_init()
 {
-
+    
     supb.used_inodes_count = 0;
     supb.used_blocks_count = 65; // 被使用的块，supb+inode table
     supb.free_inodes_count = MAX_INODE_COUNT;
